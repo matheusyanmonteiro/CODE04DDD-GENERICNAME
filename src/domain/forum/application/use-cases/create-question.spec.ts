@@ -1,6 +1,6 @@
+import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { InMemoryQuestionsRepository } from 'test/repository/in-memory-questions-repository'
 import { CreateQuestionUseCase } from './create-question'
-import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 
 let inMemoryQuestionRepository: InMemoryQuestionsRepository
 let sut: CreateQuestionUseCase
@@ -20,7 +20,10 @@ describe('Create Question', () => {
     })
 
     expect(result.isRight())
-    expect(inMemoryQuestionRepository.items[0]).toEqual(result.value?.question)
+    expect(inMemoryQuestionRepository.items[0]).toEqual(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (result.value as unknown as { question: any })?.question,
+    )
     expect(
       inMemoryQuestionRepository.items[0].attachments.currentItems,
     ).toHaveLength(2)
