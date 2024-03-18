@@ -12,7 +12,12 @@ let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachmentsRepository
 
 describe('Edit Question', () => {
   beforeEach(() => {
-    inMemoryQuestionRepository = new InMemoryQuestionsRepository()
+    inMemoryQuestionAttachmentsRepository =
+      new InMemoryQuestionAttachmentsRepository()
+
+    inMemoryQuestionRepository = new InMemoryQuestionsRepository(
+      inMemoryQuestionAttachmentsRepository,
+    )
 
     inMemoryQuestionAttachmentsRepository =
       new InMemoryQuestionAttachmentsRepository()
