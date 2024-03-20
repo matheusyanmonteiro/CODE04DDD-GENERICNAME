@@ -1,7 +1,7 @@
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
+import { makeAnswerComment } from 'test/factory/make-answer-comment'
 import { InMemoryAnswerCommentsRepository } from 'test/repository/in-memory-answer-comments-repository'
 import { FetchAnswerCommentsUseCase } from './fetch-answer-comments'
-import { makeAnswerComment } from 'test/factory/make-answer-comment'
 
 let inMemoryAnswerCommentsRepository: InMemoryAnswerCommentsRepository
 let sut: FetchAnswerCommentsUseCase
@@ -37,7 +37,10 @@ describe('Fetch Answer Comments', () => {
     })
 
     expect(result.isRight()).toBe(true)
-    expect(result.value?.answerComments).toHaveLength(3)
+    expect(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (result.value as unknown as { answerComments: any })?.answerComments,
+    ).toHaveLength(3)
   })
 
   it('should be able to fetch paginated answer comments', async () => {
@@ -54,6 +57,9 @@ describe('Fetch Answer Comments', () => {
       page: 2,
     })
 
-    expect(result.value?.answerComments).toHaveLength(2)
+    expect(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (result.value as unknown as { answerComments: any })?.answerComments,
+    ).toHaveLength(2)
   })
 })

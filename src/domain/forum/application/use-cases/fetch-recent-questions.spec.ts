@@ -1,13 +1,19 @@
-import { InMemoryQuestionsRepository } from 'test/repository/in-memory-questions-repository'
 import { makeQuestion } from 'test/factory/make-question'
+import { InMemoryQuestionAttachmentsRepository } from 'test/repository/in-memory-question-attachments-repository'
+import { InMemoryQuestionsRepository } from 'test/repository/in-memory-questions-repository'
 import { FetchRecentQuestionsUseCase } from './fetch-recent-questions'
 
+let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachmentsRepository
 let inMemoryQuestionRepository: InMemoryQuestionsRepository
 let sut: FetchRecentQuestionsUseCase
 
 describe('Fetch Recent Questions', () => {
   beforeEach(() => {
-    inMemoryQuestionRepository = new InMemoryQuestionsRepository()
+    inMemoryQuestionAttachmentsRepository =
+      new InMemoryQuestionAttachmentsRepository()
+    inMemoryQuestionRepository = new InMemoryQuestionsRepository(
+      inMemoryQuestionAttachmentsRepository,
+    )
     sut = new FetchRecentQuestionsUseCase(inMemoryQuestionRepository)
   })
 
@@ -29,12 +35,15 @@ describe('Fetch Recent Questions', () => {
       page: 1,
     })
 
-    expect(result.value?.questions).toEqual([
-      expect.objectContaining({ createdAt: new Date(2023, 0, 25) }),
-      expect.objectContaining({ createdAt: new Date(2023, 0, 20) }),
-      expect.objectContaining({ createdAt: new Date(2023, 0, 12) }),
-      expect.objectContaining({ createdAt: new Date(2023, 0, 6) }),
-    ])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((result.value as unknown as { questions: any[] }).questions).toEqual(
+      [
+        expect.objectContaining({ createdAt: new Date(2023, 0, 25) }),
+        expect.objectContaining({ createdAt: new Date(2023, 0, 20) }),
+        expect.objectContaining({ createdAt: new Date(2023, 0, 12) }),
+        expect.objectContaining({ createdAt: new Date(2023, 0, 6) }),
+      ],
+    )
   })
 
   it('should be able to fetch paginated recent questions ', async () => {
@@ -45,7 +54,9 @@ describe('Fetch Recent Questions', () => {
     const result = await sut.execute({
       page: 2,
     })
-
-    expect(result.value?.questions).toHaveLength(2)
+    expect(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (result.value as unknown as { questions: any[] }).questions,
+    ).toHaveLength(2)
   })
 })

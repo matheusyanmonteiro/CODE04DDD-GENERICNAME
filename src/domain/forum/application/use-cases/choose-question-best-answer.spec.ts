@@ -1,19 +1,31 @@
-import { InMemoryQuestionsRepository } from 'test/repository/in-memory-questions-repository'
-import { makeQuestion } from 'test/factory/make-question'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
-import { InMemoryAnswersRepository } from 'test/repository/in-memory-answers-repository'
-import { ChooseQuestionBestAnswer } from './choose-question-best-answer'
 import { makeAnswer } from 'test/factory/make-answer'
+import { makeQuestion } from 'test/factory/make-question'
+import { InMemoryAnwserAttachmentsRepository } from 'test/repository/in-memory-answer-attachments-repository'
+import { InMemoryAnswersRepository } from 'test/repository/in-memory-answers-repository'
+import { InMemoryQuestionAttachmentsRepository } from 'test/repository/in-memory-question-attachments-repository'
+import { InMemoryQuestionsRepository } from 'test/repository/in-memory-questions-repository'
+import { ChooseQuestionBestAnswer } from './choose-question-best-answer'
 import { NotAllowedError } from './errors/not-allowed-error'
 
+let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachmentsRepository
+let inMemoryAnswerAttachmentRepository: InMemoryAnwserAttachmentsRepository
 let inMemoryQuestionRepository: InMemoryQuestionsRepository
 let inMemoryAnswerRepository: InMemoryAnswersRepository
 let sut: ChooseQuestionBestAnswer
 
 describe('Choose Question Best Answer', () => {
   beforeEach(() => {
-    inMemoryQuestionRepository = new InMemoryQuestionsRepository()
-    inMemoryAnswerRepository = new InMemoryAnswersRepository()
+    inMemoryQuestionAttachmentsRepository =
+      new InMemoryQuestionAttachmentsRepository()
+    inMemoryQuestionRepository = new InMemoryQuestionsRepository(
+      inMemoryQuestionAttachmentsRepository,
+    )
+    inMemoryAnswerAttachmentRepository =
+      new InMemoryAnwserAttachmentsRepository()
+    inMemoryAnswerRepository = new InMemoryAnswersRepository(
+      inMemoryAnswerAttachmentRepository,
+    )
 
     sut = new ChooseQuestionBestAnswer(
       inMemoryQuestionRepository,

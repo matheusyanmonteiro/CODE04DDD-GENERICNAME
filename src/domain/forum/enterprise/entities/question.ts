@@ -1,9 +1,9 @@
 import { AggregateRoot } from '@/core/entities/aggregate-root'
-import { Slug } from './value-objects/slug'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
 import { Optional } from '@/core/types/optional'
 import dayjs from 'dayjs'
 import { QuestionAttachmentList } from './question-attachment-list'
+import { Slug } from './value-objects/slug'
 
 export interface QuestionProps {
   authorId: UniqueEntityID
@@ -74,6 +74,7 @@ export class Question extends AggregateRoot<QuestionProps> {
 
   set attachments(attachments: QuestionAttachmentList) {
     this.props.attachments = attachments
+    this.touch()
   }
 
   set bestAnswerId(bestAnswerId: UniqueEntityID | undefined) {

@@ -1,14 +1,20 @@
-import { makeAnswer } from 'test/factory/make-answer'
-import { FetchQuestionAnswersUseCase } from './fetch-question-answers'
-import { InMemoryAnswersRepository } from 'test/repository/in-memory-answers-repository'
 import { UniqueEntityID } from '@/core/entities/unique-entity-id'
+import { makeAnswer } from 'test/factory/make-answer'
+import { InMemoryAnwserAttachmentsRepository } from 'test/repository/in-memory-answer-attachments-repository'
+import { InMemoryAnswersRepository } from 'test/repository/in-memory-answers-repository'
+import { FetchQuestionAnswersUseCase } from './fetch-question-answers'
 
+let inMemoryAnswerAttachmentRepository: InMemoryAnwserAttachmentsRepository
 let inMemoryAnswersRepository: InMemoryAnswersRepository
 let sut: FetchQuestionAnswersUseCase
 
 describe('Fetch Questions Answers', () => {
   beforeEach(() => {
-    inMemoryAnswersRepository = new InMemoryAnswersRepository()
+    inMemoryAnswerAttachmentRepository =
+      new InMemoryAnwserAttachmentsRepository()
+    inMemoryAnswersRepository = new InMemoryAnswersRepository(
+      inMemoryAnswerAttachmentRepository,
+    )
     sut = new FetchQuestionAnswersUseCase(inMemoryAnswersRepository)
   })
 
@@ -33,8 +39,8 @@ describe('Fetch Questions Answers', () => {
       questionId: 'question-1',
       page: 1,
     })
-
-    expect(result.value?.answers).toHaveLength(3)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((result.value as any)?.answers).toHaveLength(3)
   })
 
   it('should be able to fetch paginated question answers ', async () => {
@@ -50,7 +56,7 @@ describe('Fetch Questions Answers', () => {
       questionId: 'question-1',
       page: 2,
     })
-
-    expect(result.value?.answers).toHaveLength(2)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((result.value as any)?.answers).toHaveLength(2)
   })
 })
