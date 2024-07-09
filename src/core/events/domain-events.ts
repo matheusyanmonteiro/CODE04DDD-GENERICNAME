@@ -38,4 +38,49 @@ export class DomainEvents {
   ): AggregateRoot<any> | undefined {
     return this.markedAggregates.find((aggregate) => aggregate.id.equals(id))
   }
+
+  public static dispatchEventsForAggregate(id: UniqueEntityID) {
+    const aggregate = this.findMarkedAggregateByID(id)
+
+    if (aggregate) {
+      this.dispatchAggregateEvents(aggregate)
+      aggregate.clearEvents()
+      this.removeAggregateFormMarkedDispatchList(aggregate)
+    }
+  }
+
+  public static register(
+    callback: DomainEventCallBack,
+    eventClassName: string,
+  ) {
+    const wasEventRegisteredBefore = eventClassName in this.handlersMap
+
+    if (!wasEventRegisteredBefore) {
+      this.handlersMap[eventClassName] = []
+    }
+
+    this.handlersMap[eventClassName].push(callback)
+  }
+
+  public static clearHandlers() {
+    this.handlersMap = {}
+  }
+
+  public static clearMarkedAggregates() {
+    this.markedAggregates = []
+  }
+
+  private static dispatch(event: DomainEvent) {
+    const eventClassName: string = event.constructor.name
+
+    const isEventRegistered = eventClassName in this.handlersMap
+
+    if (isEventRegistered) {
+      const handlers = this.handlersMap[eventClassName]
+
+      for (const handler of handlers) {
+        handler(event)
+      }
+    }
+  }
 }
