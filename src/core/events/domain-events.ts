@@ -1,16 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { AggregateRoot } from '../entities/aggregate-root'
 import { UniqueEntityID } from '../entities/unique-entity-id'
 import { DomainEvent } from './domain-event'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type DomainEventCallBack = (event: any) => void
+type DomainEventCallback = (event: any) => void
 
 export class DomainEvents {
-  private static handlersMap: Record<string, DomainEventCallBack[]> = {}
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private static handlersMap: Record<string, DomainEventCallback[]> = {}
   private static markedAggregates: AggregateRoot<any>[] = []
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public static markAggregateForDispatch(aggregate: AggregateRoot<any>) {
     const aggregateFound = !!this.findMarkedAggregateByID(aggregate.id)
 
@@ -20,12 +18,10 @@ export class DomainEvents {
   }
 
   private static dispatchAggregateEvents(aggregate: AggregateRoot<any>) {
-    aggregate.domainEvents.forEach((event: DomainEvent) =>
-      this.dispatchAggregateEvents(event),
-    )
+    aggregate.domainEvents.forEach((event: DomainEvent) => this.dispatch(event))
   }
 
-  private static removeAggregateFormMarkedDispatchList(
+  private static removeAggregateFromMarkedDispatchList(
     aggregate: AggregateRoot<any>,
   ) {
     const index = this.markedAggregates.findIndex((a) => a.equals(aggregate))
@@ -45,12 +41,12 @@ export class DomainEvents {
     if (aggregate) {
       this.dispatchAggregateEvents(aggregate)
       aggregate.clearEvents()
-      this.removeAggregateFormMarkedDispatchList(aggregate)
+      this.removeAggregateFromMarkedDispatchList(aggregate)
     }
   }
 
   public static register(
-    callback: DomainEventCallBack,
+    callback: DomainEventCallback,
     eventClassName: string,
   ) {
     const wasEventRegisteredBefore = eventClassName in this.handlersMap
