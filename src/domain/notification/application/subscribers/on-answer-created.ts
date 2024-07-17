@@ -1,9 +1,14 @@
 import { DomainEvents } from '@/core/events/domain-events'
 import { EventHandler } from '@/core/events/event.handler'
+import { QuestionsRepository } from '@/domain/forum/application/repositories/questions-repository'
 import { AnswerCreatedEvent } from '@/domain/forum/events/answer-created-event'
+import { SendNotificationUseCase } from '../use-cases/send-notification'
 
 export class OnAnswerCreated implements EventHandler {
-  constructor() {
+  constructor(
+    private questionRepository: QuestionsRepository,
+    private sendNotification: SendNotificationUseCase,
+  ) {
     this.setupSubscriptions()
   }
 
@@ -15,6 +20,18 @@ export class OnAnswerCreated implements EventHandler {
   }
 
   private async sendNewAnswerNotification({ answer }: AnswerCreatedEvent) {
-    console.log('this is a answer results', answer)
+    const question = await this.questionRepository.findById(
+      answer.questionId.toString(),
+    )
+
+    if (question) {
+      await this.sendNotification.execute({
+        recipentId: question.authorId.toString(),
+        title: `New Answer on question: "${question.title
+          .substring(0, 40)
+          .concat('...')}"`,
+        content: answer.excerpt,
+      })
+    }
   }
 }
