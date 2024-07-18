@@ -4,7 +4,7 @@ import { Notification } from '../../enterprise/entities/notification'
 import { NotificationsRepository } from '../repositories/notifications-repository'
 
 export interface SendNotificationUseCaseRequest {
-  recipentId: string
+  recipientId: string
   title: string
   content: string
 }
@@ -20,12 +20,12 @@ export class SendNotificationUseCase {
   constructor(private notificationsRepository: NotificationsRepository) {}
 
   async execute({
-    recipentId,
+    recipientId,
     title,
     content,
   }: SendNotificationUseCaseRequest): Promise<SendNotificationUseCaseResponse> {
     const notification = Notification.create({
-      recipientId: new UniqueEntityID(recipentId),
+      recipientId: new UniqueEntityID(recipientId),
       title,
       content,
     })
